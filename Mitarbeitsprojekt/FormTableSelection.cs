@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Mitarbeitsprojekt
 {
     public partial class FormTableSelection : Form
     {
-        private SqlConnection connection;
+        private SQLManagement sqlManager;
         private List<string> tables;
+        private SqlConnection connection;
 
-        public FormTableSelection(SqlConnection conn)
+        public FormTableSelection(SQLManagement manager)
         {
             InitializeComponent();
-            connection = conn;
+            sqlManager = manager;
             tables = new List<string>();
+        }
+
+        public FormTableSelection(SqlConnection connection)
+        {
+            this.connection = connection;
         }
 
         private void FormTableSelection_Load(object sender, EventArgs e)
@@ -31,29 +31,7 @@ namespace Mitarbeitsprojekt
 
         private void LoadTables()
         {
-            try
-            {
-                if (connection.State == ConnectionState.Closed)
-                    connection.Open();
-
-                // Tabellen abrufen
-                DataTable tablesTable = connection.GetSchema("Tables");
-                tables.Clear();
-
-                foreach (DataRow row in tablesTable.Rows)
-                {
-                    string tableName = row["TABLE_NAME"].ToString();
-                    tables.Add(tableName);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fehler beim Laden der Tabellen: {ex.Message}");
-            }
-            finally
-            {
-                connection.Close();
-            }
+            tables = sqlManager.GetTables();
         }
 
         private void UpdateTableList()
@@ -61,10 +39,15 @@ namespace Mitarbeitsprojekt
             comboBoxTable.Items.Clear();
             comboBoxTable.Items.AddRange(tables.ToArray());
         }
-
         private void comboBoxTable_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
+
+        private void FormTableSelection_Load_1(object sender, EventArgs e)
+        {
+            LoadTables();
+        }
+
     }
 }

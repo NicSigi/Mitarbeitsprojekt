@@ -55,6 +55,7 @@ namespace Mitarbeitsprojekt
             this.comboBoxTable.Size = new System.Drawing.Size(200, 21);
             this.comboBoxTable.TabIndex = 1;
             this.comboBoxTable.SelectedIndexChanged += new System.EventHandler(this.comboBoxTable_SelectedIndexChanged);
+
             // 
             // btnUse
             // 
@@ -110,6 +111,7 @@ namespace Mitarbeitsprojekt
             this.Name = "FormTableSelection";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Table Management";
+            this.Load += new System.EventHandler(this.FormTableSelection_Load_1);
             this.ResumeLayout(false);
             this.PerformLayout();
 

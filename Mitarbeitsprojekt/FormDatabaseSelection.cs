@@ -130,6 +130,7 @@
                     connection = new SqlConnection(connectionString);
                     connection.Open();
 
+                    FormDatabaseSelection formDatabaseSelection = new FormDatabaseSelection(connection);
                     FormTableSelection formTableSelection = new FormTableSelection(connection);
                     this.Hide();
                     formTableSelection.ShowDialog();
