@@ -1,159 +1,214 @@
-﻿    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Data;
-    using System.Data.SqlClient;
-    using System.Drawing;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows.Forms;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Windows.Forms;
 
-    namespace Mitarbeitsprojekt
-    {
-            //(localdb)\MSSQLLocalDB
+namespace Mitarbeitsprojekt
+{
     public partial class FormDatabaseSelection : Form
-        {
-            private List<string> databases;
-            private SqlConnection connection;
-            private string connectionString;
+    {
+        private List<string> databases; // Liste der verfügbaren Datenbanken
+        private SqlConnection connection; // Verbindung zur SQL-Datenbank
 
-            public FormDatabaseSelection(SqlConnection conn)
+        // Konstruktor - Verbindung wird übergeben
+        public FormDatabaseSelection(SqlConnection conn)
+        {
+            InitializeComponent();
+            connection = conn; // Verbindung speichern
+            databases = new List<string>(); // Liste initialisieren
+            LoadDatabases(); // Datenbanken laden
+            UpdateDatabaseList(); // Datenbankliste in ComboBox anzeigen
+        }
+
+        // Datenbanken laden
+        private void LoadDatabases()
+        {
+            try
             {
-                InitializeComponent();
-                connection = conn;
-                databases = new List<string>();
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open(); // Verbindung öffnen, falls geschlossen
+
+                // SQL-Schema "Databases" abfragen
+                DataTable databasesTable = connection.GetSchema("Databases");
+                databases.Clear(); // Liste leeren
+
+                // Jede Datenbank zur Liste hinzufügen
+                foreach (DataRow row in databasesTable.Rows)
+                {
+                    string databaseName = row["database_name"].ToString(); // Name abrufen
+                    databases.Add(databaseName); // Zur Liste hinzufügen
+                }
+            }
+            catch (Exception ex) // Fehler abfangen
+            {
+                MessageBox.Show($"Fehler beim Laden der Datenbanken: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close(); // Verbindung schließen
+            }
+        }
+
+        // ComboBox mit Datenbanken aktualisieren
+        private void UpdateDatabaseList()
+        {
+            cmbDatabases.Items.Clear(); // ComboBox leeren
+            cmbDatabases.Items.AddRange(databases.ToArray()); // Neue Datenbanken einfügen
+            cmbDatabases.SelectedIndex = databases.Count > 0 ? 0 : -1; // Erste auswählen
+        }
+
+        // Neue Datenbank hinzufügen
+        private void BtnNew_Click(object sender, EventArgs e)
+        {
+            string newDbName = txtNewDatabase.Text.Trim(); // Name der neuen Datenbank
+            if (string.IsNullOrEmpty(newDbName))
+            {
+                MessageBox.Show("Bitte geben Sie einen gültigen Datenbanknamen ein.");
+                return;
+            }
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string createDbQuery = $"CREATE DATABASE [{newDbName}]"; // SQL-Abfrage zum Erstellen der Datenbank
+                using (SqlCommand cmd = new SqlCommand(createDbQuery, connection))
+                {
+                    cmd.ExecuteNonQuery(); // Abfrage ausführen
+                }
+
+                MessageBox.Show($"Datenbank '{newDbName}' erfolgreich erstellt!");
+
+                // Liste der Datenbanken aktualisieren
                 LoadDatabases();
                 UpdateDatabaseList();
             }
-
-            private void LoadDatabases()
+            catch (Exception ex)
             {
-                try
-                {
-                    if (connection.State == ConnectionState.Closed)
-                        connection.Open();
+                MessageBox.Show($"Fehler beim Erstellen der Datenbank: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
 
-                    // Datenbanken abrufen
-                    DataTable databasesTable = connection.GetSchema("Databases");
-                    databases.Clear();
 
-                    foreach (DataRow row in databasesTable.Rows)
-                    {
-                        string databaseName = row["database_name"].ToString();
-                        databases.Add(databaseName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Fehler beim Laden der Datenbanken: {ex.Message}");
-                }
-                finally
-                {
-                    connection.Close();
-                }
+        // Datenbank löschen
+        private void BtnDelete_Click(object sender, EventArgs e)
+        {
+            if (cmbDatabases.SelectedItem == null) // Prüfen, ob etwas ausgewählt ist
+            {
+                MessageBox.Show("Bitte wählen Sie eine Datenbank zum Löschen aus.");
+                return; // Abbrechen
             }
 
-            private void UpdateDatabaseList()
+            string selectedDb = cmbDatabases.SelectedItem.ToString(); // Ausgewählte Datenbank holen
+
+            try
             {
-                cmbDatabases.Items.Clear();
-                cmbDatabases.Items.AddRange(databases.ToArray());
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open(); // Verbindung öffnen
+
+                // SQL-Befehl für das Löschen der Datenbank
+                string query = $"DROP DATABASE [{selectedDb}]";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery(); // Befehl ausführen
+                }
+
+                databases.Remove(selectedDb); // Datenbank aus der Liste entfernen
+                MessageBox.Show($"Datenbank '{selectedDb}' erfolgreich gelöscht.");
+                UpdateDatabaseList(); // Liste aktualisieren
+            }
+            catch (Exception ex) // Fehler abfangen
+            {
+                MessageBox.Show($"Fehler beim Löschen der Datenbank: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close(); // Verbindung schließen
+            }
+        }
+
+        // Datenbank umbenennen
+        private void BtnRename_Click(object sender, EventArgs e)
+        {
+            if (cmbDatabases.SelectedItem == null) // Prüfen, ob etwas ausgewählt ist
+            {
+                MessageBox.Show("Bitte wählen Sie eine Datenbank zum Umbenennen aus.");
+                return; // Abbrechen
             }
 
-            private void BtnNew_Click(object sender, EventArgs e, TextBox txtNewDatabase)
+            string selectedDb = cmbDatabases.SelectedItem.ToString(); // Ausgewählte Datenbank holen
+            string newDbName = txtNewDatabase.Text.Trim(); // Neuer Name aus TextBox
+
+            if (string.IsNullOrEmpty(newDbName)) // Prüfen, ob der neue Name leer ist
             {
-                string newDbName = txtNewDatabase.Text.Trim();
-                if (!string.IsNullOrEmpty(newDbName) && !databases.Contains(newDbName))
-                {
-                    databases.Add(newDbName);
-                    MessageBox.Show($"Datenbank '{newDbName}' erfolgreich hinzugefügt!");
-                    UpdateDatabaseList();
-                }
-                else
-                {
-                    MessageBox.Show("Ungültiger oder doppelter Datenbankname.");
-                }
+                MessageBox.Show("Bitte geben Sie einen neuen gültigen Datenbanknamen ein.");
+                return; // Abbrechen
             }
 
-            private void BtnDelete_Click(object sender, EventArgs e, ComboBox cmbDatabases)
+            if (databases.Contains(newDbName)) // Prüfen, ob neuer Name schon existiert
             {
-                if (cmbDatabases.SelectedItem != null)
-                {
-                    string selectedDb = cmbDatabases.SelectedItem.ToString();
-                    databases.Remove(selectedDb);
-                    MessageBox.Show($"Datenbank '{selectedDb}' erfolgreich gelöscht!");
-                    UpdateDatabaseList();
-                }
-                else
-                {
-                    MessageBox.Show("Bitte wählen Sie eine Datenbank zum Löschen aus.");
-                }
+                MessageBox.Show("Eine Datenbank mit diesem Namen existiert bereits.");
+                return; // Abbrechen
             }
 
-            private void BtnRename_Click(object sender, EventArgs e, ComboBox cmbDatabases, TextBox txtNewDatabase)
-            {
-                if (cmbDatabases.SelectedItem != null)
-                {
-                    string selectedDb = cmbDatabases.SelectedItem.ToString();
-                    string newDbName = txtNewDatabase.Text.Trim();
-                    if (!string.IsNullOrEmpty(newDbName) && !databases.Contains(newDbName))
-                    {
-                        int index = databases.IndexOf(selectedDb);
-                        databases[index] = newDbName;
-                        MessageBox.Show($"Datenbank '{selectedDb}' erfolgreich in '{newDbName}' umbenannt!");
-                        UpdateDatabaseList();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Ungültiger oder doppelter neuer Datenbankname.");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Bitte wählen Sie eine Datenbank zum Umbenennen aus.");
-                }
-            }
+            // Datenbanken können nicht direkt umbenannt werden
+            MessageBox.Show("Datenbanken können nicht direkt umbenannt werden. Erstellen Sie eine neue Datenbank und kopieren Sie die Daten.");
+        }
 
-            private void BtnUse_Click(object sender, EventArgs e)
-            {
-            if (cmbDatabases.SelectedItem != null)
-            {
-                string selectedDb = cmbDatabases.SelectedItem.ToString();
-                try
-                {
-                    var builder = new SqlConnectionStringBuilder(connection.ConnectionString)
-                    {
-                        InitialCatalog = selectedDb
-                    };
-                    connectionString = builder.ConnectionString;
-
-                    connection = new SqlConnection(connectionString);
-                    connection.Open();
-
-                    FormDatabaseSelection formDatabaseSelection = new FormDatabaseSelection(connection);
-                    FormTableSelection formTableSelection = new FormTableSelection(connection);
-                    this.Hide();
-                    formTableSelection.ShowDialog();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Fehler beim Verbinden mit der Datenbank: {ex.Message}");
-                }
-            }
-            else
+        // Datenbank verwenden
+        private void BtnUse_Click(object sender, EventArgs e)
+        {
+            if (cmbDatabases.SelectedItem == null) // Prüfen, ob etwas ausgewählt ist
             {
                 MessageBox.Show("Bitte wählen Sie eine Datenbank zum Verwenden aus.");
+                return; // Abbrechen
+            }
+
+            string selectedDb = cmbDatabases.SelectedItem.ToString(); // Ausgewählte Datenbank holen
+
+            try
+            {
+                // ConnectionString aktualisieren
+                var builder = new SqlConnectionStringBuilder(connection.ConnectionString)
+                {
+                    InitialCatalog = selectedDb // Datenbankname setzen
+                };
+
+                connection = new SqlConnection(builder.ConnectionString); // Neue Verbindung
+                connection.Open(); // Verbindung testen
+
+                MessageBox.Show($"Datenbank '{selectedDb}' erfolgreich ausgewählt!");
+
+                // Nächste Form öffnen
+                FormTableSelection formTableSelection = new FormTableSelection(connection);
+                this.Hide(); // Aktuelles Fenster verstecken
+                formTableSelection.ShowDialog(); // Neues Fenster anzeigen
+                this.Close(); // Aktuelles Fenster schließen
+            }
+            catch (Exception ex) // Fehler abfangen
+            {
+                MessageBox.Show($"Fehler beim Verwenden der Datenbank: {ex.Message}");
             }
         }
 
-            private void cmbDatabases_SelectedIndexChanged(object sender, EventArgs e)
-            {
-
-            }
-
-            private void FormDatabaseSelection_Load(object sender, EventArgs e)
-            {
-
-            }
+        private void FormDatabaseSelection_Load(object sender, EventArgs e)
+        {
+            LoadDatabases(); // Datenbanken laden
+            UpdateDatabaseList(); // Liste aktualisieren
         }
+
+        private void cmbDatabases_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Auswahl in ComboBox geändert
+        }
+
+
+
     }
+}
