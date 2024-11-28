@@ -8,66 +8,71 @@ namespace Mitarbeitsprojekt
 {
     public class SQLManagement
     {
-        public SqlConnection connection;
+        public SqlConnection connection; // Verbindung zur Datenbank
 
+        // Konstruktor: Initialisiert die SQL-Verbindung
         public SQLManagement()
         {
-            connection = new SqlConnection();
+            connection = new SqlConnection(); // Leere Verbindung erstellen
         }
 
+        // Setzt die Verbindungszeichenfolge
         public void SetConnection(string connectionString)
         {
-            connection.ConnectionString = connectionString;
+            connection.ConnectionString = connectionString; // Verbindung konfigurieren
         }
 
+        // Gibt die aktuelle SQL-Verbindung zurück
         public SqlConnection GetConnection()
         {
-            return connection;
+            return connection; // Verbindung zurückgeben
         }
 
+        // Testet die Verbindung zur Datenbank
         public bool TestConnection()
         {
             try
             {
-                connection.Open();
-                return true;
+                connection.Open(); // Verbindung öffnen
+                return true; // Verbindung erfolgreich
             }
             catch
             {
-                return false;
+                return false; // Fehler bei der Verbindung
             }
             finally
             {
-                connection.Close();
+                connection.Close(); // Verbindung immer schließen
             }
         }
 
+        // Ruft die Liste der Tabellen aus der Datenbank ab
         public List<string> GetTables()
         {
-            List<string> tables = new List<string>();
+            List<string> tables = new List<string>(); // Liste für Tabellennamen
 
             try
             {
                 if (connection.State == ConnectionState.Closed)
-                    connection.Open();
+                    connection.Open(); // Verbindung öffnen, falls geschlossen
 
-                DataTable tablesTable = connection.GetSchema("Tables");
-                foreach (DataRow row in tablesTable.Rows)
+                DataTable tablesTable = connection.GetSchema("Tables"); // Tabellen abrufen
+                foreach (DataRow row in tablesTable.Rows) // Zeilen durchlaufen
                 {
-                    string tableName = row["TABLE_NAME"].ToString();
-                    tables.Add(tableName);
+                    string tableName = row["TABLE_NAME"].ToString(); // Tabellenname abrufen
+                    tables.Add(tableName); // Zur Liste hinzufügen
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Laden der Tabellen: {ex.Message}");
+                MessageBox.Show($"Fehler beim Laden der Tabellen: {ex.Message}"); // Fehler anzeigen
             }
             finally
             {
-                connection.Close();
+                connection.Close(); // Verbindung schließen
             }
 
-            return tables;
+            return tables; // Tabellenliste zurückgeben
         }
     }
 }
