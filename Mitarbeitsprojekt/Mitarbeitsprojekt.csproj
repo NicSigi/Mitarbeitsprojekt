@@ -164,6 +164,12 @@
     <Compile Include="FormLogin.Designer.cs">
       <DependentUpon>FormLogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormTableEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTableEditor.Designer.cs">
+      <DependentUpon>FormTableEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTableSelection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -178,6 +184,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTableEditor.resx">
+      <DependentUpon>FormTableEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormTableSelection.resx">
       <DependentUpon>FormTableSelection.cs</DependentUpon>

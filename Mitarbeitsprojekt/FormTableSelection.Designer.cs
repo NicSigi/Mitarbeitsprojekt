@@ -54,7 +54,6 @@ namespace Mitarbeitsprojekt
             this.comboBoxTable.Name = "comboBoxTable";
             this.comboBoxTable.Size = new System.Drawing.Size(200, 21);
             this.comboBoxTable.TabIndex = 1;
-            this.comboBoxTable.SelectedIndexChanged += new System.EventHandler(this.comboBoxTable_SelectedIndexChanged);
 
             // 
             // btnUse
@@ -96,6 +95,20 @@ namespace Mitarbeitsprojekt
             this.btnDelete.Size = new System.Drawing.Size(100, 25);
             this.btnDelete.TabIndex = 6;
             this.btnDelete.Text = "Delete";
+            // TextBox hinzufügen
+            TextBox txtTableName = new TextBox();
+            txtTableName.Name = "txtTableName";
+            txtTableName.Location = new System.Drawing.Point(20, 20);
+            txtTableName.Size = new System.Drawing.Size(200, 20);
+            this.Controls.Add(txtTableName);
+
+            // Button hinzufügen
+            Button btnCreateTable = new Button();
+            btnCreateTable.Name = "btnCreateTable";
+            btnCreateTable.Text = "Tabelle erstellen";
+            btnCreateTable.Location = new System.Drawing.Point(230, 20);
+            btnCreateTable.Click += btnCreateTable_Click;
+            this.Controls.Add(btnCreateTable);
             // 
             // FormTableSelection
             // 
@@ -111,7 +124,7 @@ namespace Mitarbeitsprojekt
             this.Name = "FormTableSelection";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Table Management";
-            this.Load += new System.EventHandler(this.FormTableSelection_Load_1);
+            this.Load += new System.EventHandler(this.FormTableSelection_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

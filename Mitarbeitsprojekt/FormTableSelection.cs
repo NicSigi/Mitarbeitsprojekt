@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
@@ -7,54 +8,82 @@ namespace Mitarbeitsprojekt
 {
     public partial class FormTableSelection : Form
     {
-        private SQLManagement sqlManager; // Instanz für SQL-Operationen
-        private List<string> tables; // Liste der Tabellen im aktuellen Schema
-        private SqlConnection connection; // Verbindung zur Datenbank
+        private SQLManagement sqlManager;
+        private List<string> tables;
+        private SqlConnection connection;
 
-        // Konstruktor mit SQLManagement-Objekt
+        // Konstruktor mit SQLManagement
         public FormTableSelection(SQLManagement manager)
         {
-            InitializeComponent(); // UI-Initialisierung
-            sqlManager = manager; // SQLManager zuweisen
-            tables = new List<string>(); // Tabelle-Liste initialisieren
+            InitializeComponent();
+            sqlManager = manager;
+            tables = new List<string>();
         }
 
-        // Konstruktor mit SqlConnection-Objekt
+        // Konstruktor mit SqlConnection
         public FormTableSelection(SqlConnection connection)
         {
-            this.connection = connection; // Verbindung setzen
+            InitializeComponent();
+            this.connection = connection;
+
+            // Initialisiere SQLManagement
+            sqlManager = new SQLManagement();
+            sqlManager.connection = connection;
+
+            tables = new List<string>();
         }
 
-        // Wird beim Laden des Formulars ausgeführt
         private void FormTableSelection_Load(object sender, EventArgs e)
         {
             LoadTables(); // Tabellen laden
-            UpdateTableList(); // Tabelle-Liste aktualisieren
+            UpdateTableList(); // Tabelle anzeigen
         }
 
-        // Tabellen aus der Datenbank laden
         private void LoadTables()
         {
-            tables = sqlManager.GetTables(); // Tabellen über SQLManager abrufen
+            if (sqlManager == null || sqlManager.connection == null)
+            {
+                MessageBox.Show("SQLManager oder Verbindung ist nicht korrekt initialisiert.");
+                return;
+            }
+
+            tables = sqlManager.GetTables();
         }
 
-        // ComboBox mit Tabellennamen füllen
         private void UpdateTableList()
         {
-            comboBoxTable.Items.Clear(); // ComboBox leeren
-            comboBoxTable.Items.AddRange(tables.ToArray()); // Tabellen hinzufügen
+            comboBoxTable.Items.Clear();
+            comboBoxTable.Items.AddRange(tables.ToArray());
         }
 
-        // Wird ausgelöst, wenn die Auswahl in der ComboBox geändert wird
-        private void comboBoxTable_SelectedIndexChanged(object sender, EventArgs e)
+        private void btnCreateTable_Click(object sender, EventArgs e)
         {
-            // Aktuell leer, hier kann Logik ergänzt werden
-        }
+            if (sqlManager == null || sqlManager.connection == null)
+            {
+                MessageBox.Show("Verbindung nicht verfügbar.");
+                return;
+            }
 
-        // Zusätzlicher Load-Handler, sollte nicht benötigt werden
-        private void FormTableSelection_Load_1(object sender, EventArgs e)
-        {
-            LoadTables(); // Tabellen laden (wie im ersten Load-Handler)
+            string tableName = (this.Controls["txtTableName"] as TextBox)?.Text;
+            if (string.IsNullOrWhiteSpace(tableName))
+            {
+                MessageBox.Show("Bitte einen Tabellennamen eingeben.");
+                return;
+            }
+
+            try
+            {
+                sqlManager.CreateTable(tableName); // Tabelle erstellen
+                MessageBox.Show($"Tabelle '{tableName}' erfolgreich erstellt.");
+                LoadTables(); // Tabellenliste aktualisieren
+                UpdateTableList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Erstellen der Tabelle: {ex.Message}");
+            }
         }
+        
+
     }
 }

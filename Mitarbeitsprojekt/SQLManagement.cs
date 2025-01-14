@@ -74,5 +74,63 @@ namespace Mitarbeitsprojekt
 
             return tables; // Tabellenliste zurückgeben
         }
+        public void CreateTable(string tableName)
+        {
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string query = $@"
+            CREATE TABLE {tableName} (
+                ID INT IDENTITY(1,1) PRIMARY KEY,
+                Name NVARCHAR(50),
+                CreatedDate DATETIME DEFAULT GETDATE()
+            );";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Fehler beim Erstellen der Tabelle: {ex.Message}");
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
+        }
+        public DataTable GetColumns(string tableName)
+        {
+            DataTable columns = new DataTable();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string query = $"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{tableName}'";
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(query, connection))
+                {
+                    adapter.Fill(columns);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Fehler beim Abrufen der Spalten: {ex.Message}");
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
+
+            return columns;
+        }
+
     }
 }
