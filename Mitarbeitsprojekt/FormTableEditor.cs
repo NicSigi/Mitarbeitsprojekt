@@ -1,90 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Mitarbeitsprojekt
 {
     public partial class FormTableEditor : Form
     {
-        private SQLManagement sqlManager; // SQL-Verwaltung
-        private List<string> tables; // Tabellenliste
-        private string selectedTable; // Ausgewählte Tabelle
+        private SQLManagement sqlManager;
+        private string tableName;
 
-        public FormTableEditor(SQLManagement manager)
+        public FormTableEditor(SQLManagement manager, string selectedTable)
         {
             InitializeComponent();
-            sqlManager = manager;
-            tables = new List<string>();
+            sqlManager = manager; // SQLManagement-Instanz speichern
+            tableName = selectedTable; // Ausgewählte Tabelle speichern
         }
 
         private void FormTableEditor_Load(object sender, EventArgs e)
         {
-            LoadTables();
-            UpdateTableList();
+            LoadTableData(); // Tabellendaten beim Laden des Formulars abrufen
         }
 
-        private void LoadTables()
+        private void LoadTableData()
         {
-            // Tabellen laden
             try
             {
-                tables = sqlManager.GetTables();
+                // Tabellendaten über SQLManagement abrufen
+                DataTable tableData = sqlManager.GetTableData(tableName);
+
+                // Daten im DataGridView anzeigen
+                dataGridViewTable.DataSource = tableData;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Laden der Tabellen: {ex.Message}");
-            }
-        }
-
-        private void UpdateTableList()
-        {
-            // Tabellen in ComboBox einfügen
-            comboBoxTables.Items.Clear();
-            comboBoxTables.Items.AddRange(tables.ToArray());
-        }
-
-        private void comboBoxTables_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Ausgewählte Tabelle
-            selectedTable = comboBoxTables.SelectedItem.ToString();
-            LoadColumns();
-        }
-
-        private void LoadColumns()
-        {
-            // Spalten der Tabelle laden
-            try
-            {
-                if (string.IsNullOrEmpty(selectedTable)) return;
-
-                DataTable columnsTable = sqlManager.GetColumns(selectedTable); // Spalten abrufen
-                dataGridViewColumns.DataSource = columnsTable; // In DataGridView anzeigen
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fehler beim Laden der Spalten: {ex.Message}");
+                MessageBox.Show($"Fehler beim Laden der Tabellendaten: {ex.Message}");
             }
         }
 
         private void btnAddColumn_Click(object sender, EventArgs e)
         {
-            // Neue Spalte hinzufügen
+            // Neue Spalte zur Tabelle hinzufügen
             try
             {
                 string columnName = txtColumnName.Text;
-                string dataType = txtDataType.Text;
+                string columnType = cmbColumnType.Text;
 
-                if (string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(dataType))
+                if (string.IsNullOrWhiteSpace(columnName) || string.IsNullOrWhiteSpace(columnType))
                 {
-                    MessageBox.Show("Bitte Spaltennamen und Datentyp eingeben.");
+                    MessageBox.Show("Bitte geben Sie einen gültigen Spaltennamen und Datentyp ein.");
                     return;
                 }
 
-                sqlManager.AddColumn(selectedTable, columnName, dataType);
+                sqlManager.AddColumn(tableName, columnName, columnType); // Spalte hinzufügen
                 MessageBox.Show($"Spalte '{columnName}' erfolgreich hinzugefügt.");
-                LoadColumns();
+                LoadTableData(); // Tabelle neu laden
             }
             catch (Exception ex)
             {
@@ -94,24 +63,30 @@ namespace Mitarbeitsprojekt
 
         private void btnDeleteColumn_Click(object sender, EventArgs e)
         {
-            // Spalte löschen
+            // Spalte aus der Tabelle entfernen
             try
             {
-                if (dataGridViewColumns.SelectedRows.Count == 0)
+                string columnName = txtColumnName.Text;
+
+                if (string.IsNullOrWhiteSpace(columnName))
                 {
-                    MessageBox.Show("Bitte eine Spalte auswählen.");
+                    MessageBox.Show("Bitte geben Sie einen gültigen Spaltennamen ein.");
                     return;
                 }
 
-                string columnName = dataGridViewColumns.SelectedRows[0].Cells["COLUMN_NAME"].Value.ToString();
-                sqlManager.DeleteColumn(selectedTable, columnName);
+                sqlManager.DeleteColumn(tableName, columnName); // Spalte entfernen
                 MessageBox.Show($"Spalte '{columnName}' erfolgreich gelöscht.");
-                LoadColumns();
+                LoadTableData(); // Tabelle neu laden
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Fehler beim Löschen der Spalte: {ex.Message}");
             }
         }
+        private void comboBoxTables_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Logik für die Auswahländerung kann hier später hinzugefügt werden
+        }
+
     }
 }

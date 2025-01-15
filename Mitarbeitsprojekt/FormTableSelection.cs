@@ -83,7 +83,22 @@ namespace Mitarbeitsprojekt
                 MessageBox.Show($"Fehler beim Erstellen der Tabelle: {ex.Message}");
             }
         }
-        
 
+        private void btnUse_Click(object sender, EventArgs e)
+        {
+            // Überprüfen, ob eine Tabelle ausgewählt wurde
+            string selectedTable = comboBoxTable.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(selectedTable))
+            {
+                MessageBox.Show("Bitte wählen Sie eine Tabelle aus.");
+                return;
+            }
+
+            // Öffne das FormTableEditor mit der ausgewählten Tabelle
+            FormTableEditor tableEditor = new FormTableEditor(sqlManager, selectedTable);
+            this.Hide(); // Aktuelles Formular ausblenden
+            tableEditor.ShowDialog(); // TableEditor als Dialog anzeigen
+            this.Show(); // Aktuelles Formular wieder anzeigen, wenn TableEditor geschlossen wird
+        }
     }
 }

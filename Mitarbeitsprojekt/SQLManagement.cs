@@ -82,11 +82,11 @@ namespace Mitarbeitsprojekt
                     connection.Open();
 
                 string query = $@"
-            CREATE TABLE {tableName} (
+                CREATE TABLE {tableName} (
                 ID INT IDENTITY(1,1) PRIMARY KEY,
                 Name NVARCHAR(50),
                 CreatedDate DATETIME DEFAULT GETDATE()
-            );";
+                );";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -131,6 +131,81 @@ namespace Mitarbeitsprojekt
 
             return columns;
         }
+        public void AddColumn(string tableName, string columnName, string columnType)
+        {
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string query = $"ALTER TABLE {tableName} ADD {columnName} {columnType};";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Hinzufügen der Spalte: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+
+        public void DeleteColumn(string tableName, string columnName)
+        {
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string query = $"ALTER TABLE {tableName} DROP COLUMN {columnName};";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Löschen der Spalte: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+        public DataTable GetTableData(string tableName)
+        {
+            DataTable tableData = new DataTable();
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+
+                string query = $"SELECT * FROM {tableName};";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(tableData); // Daten in das DataTable-Objekt laden
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Abrufen der Tabellendaten: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return tableData;
+        }
+
+
 
     }
 }

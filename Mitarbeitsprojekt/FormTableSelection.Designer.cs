@@ -37,6 +37,8 @@ namespace Mitarbeitsprojekt
             this.txtNewTable = new System.Windows.Forms.TextBox();
             this.btnNew = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
+            this.txtTableName = new System.Windows.Forms.TextBox();
+            this.btnCreateTable = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblTable
@@ -54,7 +56,6 @@ namespace Mitarbeitsprojekt
             this.comboBoxTable.Name = "comboBoxTable";
             this.comboBoxTable.Size = new System.Drawing.Size(200, 21);
             this.comboBoxTable.TabIndex = 1;
-
             // 
             // btnUse
             // 
@@ -63,6 +64,7 @@ namespace Mitarbeitsprojekt
             this.btnUse.Size = new System.Drawing.Size(100, 25);
             this.btnUse.TabIndex = 2;
             this.btnUse.Text = "Use";
+            this.btnUse.Click += new System.EventHandler(this.btnUse_Click);
             // 
             // lblNewTable
             // 
@@ -95,24 +97,27 @@ namespace Mitarbeitsprojekt
             this.btnDelete.Size = new System.Drawing.Size(100, 25);
             this.btnDelete.TabIndex = 6;
             this.btnDelete.Text = "Delete";
-            // TextBox hinzufügen
-            TextBox txtTableName = new TextBox();
-            txtTableName.Name = "txtTableName";
-            txtTableName.Location = new System.Drawing.Point(20, 20);
-            txtTableName.Size = new System.Drawing.Size(200, 20);
-            this.Controls.Add(txtTableName);
-
-            // Button hinzufügen
-            Button btnCreateTable = new Button();
-            btnCreateTable.Name = "btnCreateTable";
-            btnCreateTable.Text = "Tabelle erstellen";
-            btnCreateTable.Location = new System.Drawing.Point(230, 20);
-            btnCreateTable.Click += btnCreateTable_Click;
-            this.Controls.Add(btnCreateTable);
+            // 
+            // txtTableName
+            // 
+            this.txtTableName.Location = new System.Drawing.Point(20, 20);
+            this.txtTableName.Name = "txtTableName";
+            this.txtTableName.Size = new System.Drawing.Size(200, 20);
+            this.txtTableName.TabIndex = 0;
+            // 
+            // btnCreateTable
+            // 
+            this.btnCreateTable.Location = new System.Drawing.Point(230, 20);
+            this.btnCreateTable.Name = "btnCreateTable";
+            this.btnCreateTable.Size = new System.Drawing.Size(75, 23);
+            this.btnCreateTable.TabIndex = 1;
+            this.btnCreateTable.Text = "Tabelle erstellen";
             // 
             // FormTableSelection
             // 
             this.ClientSize = new System.Drawing.Size(400, 200);
+            this.Controls.Add(this.txtTableName);
+            this.Controls.Add(this.btnCreateTable);
             this.Controls.Add(this.lblTable);
             this.Controls.Add(this.comboBoxTable);
             this.Controls.Add(this.btnUse);
@@ -139,5 +144,7 @@ namespace Mitarbeitsprojekt
         private TextBox txtNewTable;
         private Button btnNew;
         private Button btnDelete;
+        private TextBox txtTableName;
+        private Button btnCreateTable;
     }
 }
