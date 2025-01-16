@@ -6,14 +6,22 @@ namespace Mitarbeitsprojekt
 {
     public partial class FormTableEditor : Form
     {
+        private string selectedTableName;
         private SQLManagement sqlManager;
         private string tableName;
+        private string selectedTable;
 
         public FormTableEditor(SQLManagement manager, string selectedTable)
         {
             InitializeComponent();
-            sqlManager = manager; // SQLManagement-Instanz speichern
-            tableName = selectedTable; // Ausgewählte Tabelle speichern
+            this.selectedTableName = tableName; // Tabellenname speichern
+            this.sqlManager = sqlManager; // SQL-Management-Instanz speichern
+        }
+
+        public FormTableEditor(string selectedTable, SQLManagement sqlManager)
+        {
+            this.selectedTable = selectedTable;
+            this.sqlManager = sqlManager;
         }
 
         private void FormTableEditor_Load(object sender, EventArgs e)
@@ -88,5 +96,9 @@ namespace Mitarbeitsprojekt
             // Logik für die Auswahländerung kann hier später hinzugefügt werden
         }
 
+        private void FormTableEditor_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

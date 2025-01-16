@@ -190,7 +190,7 @@ namespace Mitarbeitsprojekt
                 using (SqlCommand command = new SqlCommand(query, connection))
                 using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                 {
-                    adapter.Fill(tableData); // Daten in das DataTable-Objekt laden
+                    adapter.Fill(tableData);
                 }
             }
             catch (Exception ex)

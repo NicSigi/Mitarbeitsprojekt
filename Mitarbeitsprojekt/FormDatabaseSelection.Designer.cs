@@ -80,6 +80,7 @@ namespace Mitarbeitsprojekt
             this.btnNew.Size = new System.Drawing.Size(80, 30);
             this.btnNew.TabIndex = 4;
             this.btnNew.Text = "New";
+            this.btnNew.Click += new System.EventHandler(this.BtnNew_Click);
             // 
             // btnDelete
             // 
@@ -120,8 +121,6 @@ namespace Mitarbeitsprojekt
             this.Name = "FormDatabaseSelection";
             this.Text = "Database Selection";
             this.Load += new System.EventHandler(this.FormDatabaseSelection_Load);
-
-
             this.ResumeLayout(false);
             this.PerformLayout();
 

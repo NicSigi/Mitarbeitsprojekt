@@ -48,6 +48,7 @@ namespace Mitarbeitsprojekt
             this.txtServer.Name = "txtServer";
             this.txtServer.Size = new System.Drawing.Size(76, 20);
             this.txtServer.TabIndex = 12;
+            this.txtServer.Text = "(localdb)\\MSSQLLocalDB";
             this.txtServer.TextChanged += new System.EventHandler(this.txtServer_TextChanged);
             // 
             // txtUsername
