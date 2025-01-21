@@ -183,5 +183,54 @@ namespace Mitarbeitsprojekt
             // Auswahl in ComboBox geändert
         }
 
+        private void btnDelete_Click_1(object sender, EventArgs e)
+        {
+                if (cmbDatabases.SelectedItem == null) // Prüfen, ob eine Datenbank ausgewählt wurde
+                {
+                    MessageBox.Show("Bitte wählen Sie eine Datenbank zum Löschen aus.");
+                    return; // Abbrechen, falls keine Auswahl getroffen wurde
+                }
+
+                string selectedDb = cmbDatabases.SelectedItem.ToString(); // Ausgewählte Datenbank abrufen
+
+                DialogResult result = MessageBox.Show(
+                    $"Sind Sie sicher, dass Sie die Datenbank '{selectedDb}' löschen möchten? Alle Daten gehen unwiderruflich verloren!",
+                    "Datenbank löschen",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+                if (result == DialogResult.No)
+                {
+                    return; // Abbrechen, falls der Benutzer "Nein" auswählt
+                }
+
+                try
+                {
+                    if (connection.State == ConnectionState.Closed)
+                        connection.Open(); // Verbindung öffnen
+
+                    // SQL-Befehl, um die Datenbank zu löschen
+                    string query = $"DROP DATABASE [{selectedDb}]";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.ExecuteNonQuery(); // SQL-Befehl ausführen
+                    }
+
+                    // Entfernen der gelöschten Datenbank aus der Liste
+                    databases.Remove(selectedDb);
+                    MessageBox.Show($"Datenbank '{selectedDb}' wurde erfolgreich gelöscht.");
+
+                    UpdateDatabaseList(); // Aktualisiere die Liste der verfügbaren Datenbanken
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Fehler beim Löschen der Datenbank: {ex.Message}");
+                }
+                finally
+                {
+                    connection.Close(); // Verbindung schließen
+                }
+            }
+        }
     }
-}

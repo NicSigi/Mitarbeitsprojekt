@@ -34,11 +34,9 @@ namespace Mitarbeitsprojekt
             this.comboBoxTable = new System.Windows.Forms.ComboBox();
             this.btnUse = new System.Windows.Forms.Button();
             this.lblNewTable = new System.Windows.Forms.Label();
-            this.txtNewTable = new System.Windows.Forms.TextBox();
             this.btnNew = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.txtTableName = new System.Windows.Forms.TextBox();
-            this.btnCreateTable = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblTable
@@ -69,60 +67,45 @@ namespace Mitarbeitsprojekt
             // lblNewTable
             // 
             this.lblNewTable.AutoSize = true;
-            this.lblNewTable.Location = new System.Drawing.Point(20, 90);
+            this.lblNewTable.Location = new System.Drawing.Point(20, 108);
             this.lblNewTable.Name = "lblNewTable";
             this.lblNewTable.Size = new System.Drawing.Size(59, 13);
             this.lblNewTable.TabIndex = 3;
             this.lblNewTable.Text = "New Table";
             // 
-            // txtNewTable
-            // 
-            this.txtNewTable.Location = new System.Drawing.Point(20, 120);
-            this.txtNewTable.Name = "txtNewTable";
-            this.txtNewTable.Size = new System.Drawing.Size(200, 20);
-            this.txtNewTable.TabIndex = 4;
-            // 
             // btnNew
             // 
-            this.btnNew.Location = new System.Drawing.Point(240, 120);
+            this.btnNew.Location = new System.Drawing.Point(240, 131);
             this.btnNew.Name = "btnNew";
             this.btnNew.Size = new System.Drawing.Size(100, 25);
             this.btnNew.TabIndex = 5;
             this.btnNew.Text = "New";
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(240, 160);
+            this.btnDelete.Location = new System.Drawing.Point(240, 84);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(100, 25);
             this.btnDelete.TabIndex = 6;
             this.btnDelete.Text = "Delete";
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // txtTableName
             // 
-            this.txtTableName.Location = new System.Drawing.Point(20, 20);
+            this.txtTableName.Location = new System.Drawing.Point(20, 134);
             this.txtTableName.Name = "txtTableName";
             this.txtTableName.Size = new System.Drawing.Size(200, 20);
             this.txtTableName.TabIndex = 0;
-            // 
-            // btnCreateTable
-            // 
-            this.btnCreateTable.Location = new System.Drawing.Point(230, 20);
-            this.btnCreateTable.Name = "btnCreateTable";
-            this.btnCreateTable.Size = new System.Drawing.Size(75, 23);
-            this.btnCreateTable.TabIndex = 1;
-            this.btnCreateTable.Text = "Tabelle erstellen";
             // 
             // FormTableSelection
             // 
             this.ClientSize = new System.Drawing.Size(400, 200);
             this.Controls.Add(this.txtTableName);
-            this.Controls.Add(this.btnCreateTable);
             this.Controls.Add(this.lblTable);
             this.Controls.Add(this.comboBoxTable);
             this.Controls.Add(this.btnUse);
             this.Controls.Add(this.lblNewTable);
-            this.Controls.Add(this.txtNewTable);
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.btnDelete);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -141,10 +124,8 @@ namespace Mitarbeitsprojekt
         private ComboBox comboBoxTable;
         private Button btnUse;
         private Label lblNewTable;
-        private TextBox txtNewTable;
         private Button btnNew;
         private Button btnDelete;
         private TextBox txtTableName;
-        private Button btnCreateTable;
     }
 }

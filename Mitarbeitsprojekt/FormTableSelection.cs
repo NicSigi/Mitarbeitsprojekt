@@ -58,6 +58,27 @@ namespace Mitarbeitsprojekt
 
         private void btnCreateTable_Click(object sender, EventArgs e)
         {
+            
+        }
+
+        private void btnUse_Click(object sender, EventArgs e)
+        {
+            if (comboBoxTable.SelectedItem != null)
+            {
+                string selectedTable = comboBoxTable.SelectedItem.ToString(); // Tabellenname holen
+                FormTableEditor tableEditor = new FormTableEditor(selectedTable, sqlManager); // Reihenfolge korrigieren
+                this.Hide();
+                tableEditor.ShowDialog();
+                this.Show();
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie eine Tabelle aus.");
+            }
+        }
+
+        private void btnNew_Click(object sender, EventArgs e)
+        {
             if (sqlManager == null || sqlManager.connection == null)
             {
                 MessageBox.Show("Verbindung nicht verfügbar.");
@@ -84,19 +105,53 @@ namespace Mitarbeitsprojekt
             }
         }
 
-        private void btnUse_Click(object sender, EventArgs e)
+        private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (comboBoxTable.SelectedItem != null)
+            if (comboBoxTable.SelectedItem == null) // Prüfen, ob eine Tabelle ausgewählt wurde
             {
-                string selectedTable = comboBoxTable.SelectedItem.ToString(); // Tabellenname holen
-                FormTableEditor tableEditor = new FormTableEditor(selectedTable, sqlManager); // Reihenfolge korrigieren
-                this.Hide();
-                tableEditor.ShowDialog();
-                this.Show();
+                MessageBox.Show("Bitte wählen Sie eine Tabelle zum Löschen aus.");
+                return; // Abbrechen, falls keine Auswahl getroffen wurde
             }
-            else
+
+            string selectedTable = comboBoxTable.SelectedItem.ToString(); // Ausgewählte Tabelle abrufen
+
+            DialogResult result = MessageBox.Show(
+                $"Sind Sie sicher, dass Sie die Tabelle '{selectedTable}' löschen möchten? Alle Daten in der Tabelle gehen unwiderruflich verloren!",
+                "Tabelle löschen",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.No)
             {
-                MessageBox.Show("Bitte wählen Sie eine Tabelle aus.");
+                return; // Abbrechen, falls der Benutzer "Nein" auswählt
+            }
+
+            try
+            {
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open(); // Verbindung öffnen
+
+                // SQL-Befehl, um die Tabelle zu löschen
+                string query = $"DROP TABLE [{selectedTable}]";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery(); // SQL-Befehl ausführen
+                }
+
+                // Entfernen der gelöschten Tabelle aus der Liste
+                tables.Remove(selectedTable);
+                MessageBox.Show($"Tabelle '{selectedTable}' wurde erfolgreich gelöscht.");
+
+                UpdateTableList(); // Aktualisiere die Liste der verfügbaren Tabellen
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Löschen der Tabelle: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close(); // Verbindung schließen
             }
         }
     }
